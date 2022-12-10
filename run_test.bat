@@ -1,3 +1,3 @@
 @echo off
 
-build\test\test.exe 
+start build\test\test.exe 
