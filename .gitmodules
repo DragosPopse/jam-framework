@@ -1,0 +1,6 @@
+[submodule "submodules/mani"]
+	path = submodules/mani
+	url = https://github.com/DragosPopse/mani.git
+[submodule "submodules/odin-lua"]
+	path = submodules/odin-lua
+	url = https://github.com/DragosPopse/odin-lua.git
