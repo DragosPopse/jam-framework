@@ -1,3 +1,3 @@
 @echo off
 
-xcopy shared\mani %ODIN_ROOT%\shared\mani /R /Y
+xcopy shared\jam %ODIN_ROOT%\shared\jam /R /Y
