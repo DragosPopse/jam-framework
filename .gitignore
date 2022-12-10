@@ -13,7 +13,7 @@
 !foreign/**
 !test/**
 
-!/generator/**
+!src/**
 !shared/**
 
 # Mani generations
