@@ -10,10 +10,7 @@ import smolarr "core:container/small_array"
 
 GLHandle :: u32
 
-ShaderProgram :: struct {
-    shaders: smolarr.Small_Array(5, GLHandle),
-    handle: GLHandle,
-}
+
 
 VertexArray :: struct {
     handle: GLHandle,
@@ -21,13 +18,13 @@ VertexArray :: struct {
 }
 
 
-make_vertex_array :: proc() -> (result: VertexArray) {
+make_vertex_array :: #force_inline proc() -> (result: VertexArray) {
     using result 
     gl.GenVertexArrays(1, &handle)
     return
 }
 
-make_vertex_buffer :: proc(data: []$T, usage: c.uint) -> (vbo: GLHandle) {
+make_vertex_buffer :: #force_inline proc(data: []$T, usage: c.uint) -> (vbo: GLHandle) {
     gl.GenBuffers(1, &vbo)
 
     gl.BindBuffer(gl.ARRAY_BUFFER, vbo) 
@@ -35,6 +32,13 @@ make_vertex_buffer :: proc(data: []$T, usage: c.uint) -> (vbo: GLHandle) {
 
     gl.BindBuffer(gl.ARRAY_BUFFER, 0)
     return vbo
+}
+
+make_index_buffer :: #force_inline proc(data: []c.uint, usage: c.uint) -> (ebo: GLHandle) {
+    gl.GenBuffers(1, &ebo) 
+    gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
+    gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(data) * size_of(c.uint), &data[0], usage)
+    return
 }
 
 va_add_buffer :: proc(vao: ^VertexArray, data: []$T, usage: c.uint) {
@@ -69,79 +73,8 @@ va_add_buffer :: proc(vao: ^VertexArray, data: []$T, usage: c.uint) {
     }
 }
 
-create_program :: proc() -> (result: ShaderProgram) {
-    using result
-    handle = gl.CreateProgram() 
-    return
-}
 
-add_shader :: proc(using program: ^ShaderProgram, src: string, type: c.uint) -> GLHandle {
-    shader: GLHandle = gl.CreateShader(type)
-    csrc := strings.unsafe_string_to_cstring(src) // this might not be null terminated, but we provide the length anyway 
-    length := cast(i32)len(src)
-    gl.ShaderSource(shader, 1, &csrc, &length)
-    gl.AttachShader(handle, shader)
-    return shader
-}
-
-compile_shader :: proc(shader: GLHandle) -> (temp_info: string, ok: bool) {
-    using fmt 
-    gl.CompileShader(shader)
-    
-    success: c.int 
-    log: [512]u8 
-    
-    gl.GetShaderiv(shader, gl.COMPILE_STATUS, &success)
-    
-    if success == 0 {
-        logLength: c.int 
-        gl.GetShaderInfoLog(shader, size_of(log), &logLength, &log[0])
-        logstr := strings.string_from_ptr(&log[0], cast(int)logLength)
-        return tprintf("%s", logstr), false
-    }
-
-    return temp_info, true
-}
-
-compile_shaders :: proc(using program: ^ShaderProgram) -> (temp_info: string, ok: bool) {
-    s := smolarr.slice(&shaders)
-    for shader in s {
-        if temp_info, ok = compile_shader(shader); !ok {
-            return
-        }
-    }
-    return temp_info, true
-}
-
-link_program :: proc(using program: ^ShaderProgram, delete_shaders := true) -> (temp_info: string, ok: bool) {
-    gl.LinkProgram(handle)
-    defer {
-        if delete_shaders {
-            s := smolarr.slice(&shaders)
-            for shader in s {
-                gl.DeleteShader(shader)
-            }
-        }
-    }
-
-    success: c.int 
-    log: [512]u8 
-    gl.GetProgramiv(handle, gl.LINK_STATUS, &success)
-    
-    if success == 0 {
-        logLength: c.int 
-        gl.GetProgramInfoLog(handle, size_of(log), &logLength, &log[0])
-        logstr := strings.string_from_ptr(&log[0], cast(int)logLength)
-        return fmt.tprintf("%s", logstr), false
-    }
-
-    return temp_info, true
-}
-
-bind_program :: #force_inline proc(using program: ShaderProgram) {
-    gl.UseProgram(handle)
-}
-
-bind_vertex_array :: proc(vao: VertexArray) {
+bind_vertex_array :: #force_inline proc(vao: VertexArray) {
     gl.BindVertexArray(vao.handle)
 }
+
