@@ -83,7 +83,8 @@ main :: proc() {
     }
 
     //gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
-    running := true 
+    running := true
+    scalar: f32 = 0
     for running {
         event: sdl.Event 
         for sdl.PollEvent(&event) {
@@ -95,6 +96,11 @@ main :: proc() {
         }
         gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         bind_program(shader)
+        scalar += 0.001 
+        if scalar > 1 {
+            scalar = 0
+        }
+        uniform_f32(shader, "uScalar", scalar)
         gl.DrawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, nil)
         sdl.GL_SwapWindow(window)
     }

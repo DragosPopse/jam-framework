@@ -102,7 +102,9 @@ _init_program_uniforms :: proc(using program: ^ShaderProgram) {
     length: c.int
     gl.GetProgramiv(handle, gl.ACTIVE_UNIFORMS, &count)
     for i in 0..<count {
-        gl.GetActiveUniform(handle, cast(c.uint)i, size_of(name), &length, nil, nil, &name[0])
+        size: c.int 
+        type: c.uint
+        gl.GetActiveUniform(handle, cast(c.uint)i, size_of(name), &length, &size, &type, &name[0])
         key := strings.clone_from_bytes(name[:length])
         uniforms[key] = i
     }

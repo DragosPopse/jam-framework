@@ -3,7 +3,9 @@
 in vec4 VertexColor;
 out vec4 oFragColor;
 
+uniform float uScalar;
+
 void main() 
 {
-    oFragColor = VertexColor;
+    oFragColor = VertexColor * uScalar;
 }

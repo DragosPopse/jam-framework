@@ -5,6 +5,7 @@ layout (location = 1) in vec4 aCol;
 
 out vec4 VertexColor;
 
+
 void main() 
 {
     gl_Position = vec4(aPos.xyz, 1.0);
