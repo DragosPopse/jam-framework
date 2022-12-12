@@ -17,6 +17,7 @@ VertexArray :: struct {
     n: c.uint,
 }
 
+NULL_VAO :: VertexArray{}
 
 make_vertex_array :: #force_inline proc() -> (result: VertexArray) {
     using result 

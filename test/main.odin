@@ -20,10 +20,12 @@ OGL_PROFILE :: cast(c.int)sdl.GLprofile.CORE
 Vec3f :: [3]f32 
 Vec2f :: [2]f32 
 Vec4f :: [4]f32
+Vec4bt :: [4]byte
 
 Vertex :: struct {
     using pos: Vec3f,
     col: Vec4f,
+    tex: Vec2f,
 }
 
 
@@ -36,7 +38,7 @@ main :: proc() {
     window := sdl.CreateWindow("It's a marmalade", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, 800, 600, sdl.WINDOW_OPENGL)
     glcontext := sdl.GL_CreateContext(window)
     gl.load_up_to(OGL_MAJOR, OGL_MINOR, sdl.gl_set_proc_address)
-    gl.ClearColor(0.4, 0.6, 0.3, 1.0)
+    gl.ClearColor(0.012, 0.533, 0.988, 1.0)
 
     color := Vec4f {0.4, 0.7, 0.8, 1.0}
 
@@ -44,18 +46,22 @@ main :: proc() {
         {
             pos = {0.5, 0.5, 0.0},
             col = color / 2,
+            tex = {1, 1},
         },
         {
             pos = {0.5, -0.5, 0.0},
             col = color / 3,
+            tex = {1, 0},
         },
         {
             pos = {-0.5,  -0.5, 0.0},
             col = color / 4,
+            tex = {0, 0},
         },
         {
             pos = {-0.5,  0.5, 0.0},
             col = color,
+            tex = {0, 1},
         },
     }
 
@@ -82,6 +88,16 @@ main :: proc() {
         return
     }
 
+    image, imageLoaded := load_image_from_file(`D:\dev\jam\assets\textures\coin.png`)
+    if !imageLoaded {
+        fmt.printf("Failed to load image\n")
+        return
+    }
+    defer if imageLoaded do delete_image(image)
+
+    texture := load_texture_from_image(image)
+    
+
     //gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
     running := true
     scalar: f32 = 0
@@ -101,6 +117,9 @@ main :: proc() {
             scalar = 0
         }
         uniform_f32(shader, "uScalar", scalar)
+        bind_texture(texture)
+        gl.Enable(gl.BLEND)
+        gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
         gl.DrawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, nil)
         sdl.GL_SwapWindow(window)
     }

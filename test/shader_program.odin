@@ -15,6 +15,8 @@ ShaderProgram :: struct {
     uniforms: map[string]c.int,
 }
 
+NULL_PROGRAM :: ShaderProgram {}
+
 make_program :: #force_inline proc() -> (result: ShaderProgram) {
     using result
     handle = gl.CreateProgram() 

@@ -15,6 +15,7 @@
 
 !src/**
 !shared/**
+!assets/**
 
 # Mani generations
 *.generated.odin
