@@ -50,13 +50,21 @@ va_add_buffer :: proc(vao: ^VertexArray, data: []$T, usage: c.uint) {
     tinfo := runtime.type_info_base(type_info_of(T))
 
     record := tinfo.variant.(runtime.Type_Info_Struct)
-
+    
     for name, i in record.names {
         type := record.types[i] 
         offset := record.offsets[i] 
-        #partial switch x in type.variant {
+        variant := type.variant
+        if named, ok := type.variant.(runtime.Type_Info_Named); ok {
+            variant = named.base.variant
+        }
+        #partial switch x in variant {
             case: {
-                assert(false, "Unsupported type found")
+                fmt.assertf(false, "Unsupported type found %v\n", x)
+            }
+
+            case runtime.Type_Info_Named: {
+                
             }
 
             case runtime.Type_Info_Array: {

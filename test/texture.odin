@@ -13,7 +13,7 @@ Texture :: struct {
     size: [2]uint,
 }
 
-NULL_TEX :: Texture{}
+NullTexture :: Texture{}
 
 load_texture_from_image :: proc(img: Image) -> (tex: Texture) {
     tex.size = img.size 
@@ -33,6 +33,7 @@ delete_texture :: #force_inline proc(tex: Texture) {
     gl.DeleteTextures(1, &h)
 }
 
-bind_texture :: #force_inline proc(tex: Texture) {
+bind_texture :: #force_inline proc(tex: Texture, #any_int idx := 0) {
+    gl.ActiveTexture(gl.TEXTURE0 + cast(c.uint)idx)
     gl.BindTexture(gl.TEXTURE_2D, tex.handle)
 }

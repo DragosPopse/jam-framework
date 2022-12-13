@@ -8,6 +8,10 @@ import intr "core:intrinsics"
 import gl "vendor:OpenGL"
 import smolarr "core:container/small_array"
 
+import glm "core:math/linalg/glsl"
+import math "core:math"
+import alg "core:math/linalg"
+
 
 ShaderProgram :: struct {
     shaders: smolarr.Small_Array(5, GLHandle),
@@ -15,7 +19,7 @@ ShaderProgram :: struct {
     uniforms: map[string]c.int,
 }
 
-NULL_PROGRAM :: ShaderProgram {}
+NullProgram :: ShaderProgram {}
 
 make_program :: #force_inline proc() -> (result: ShaderProgram) {
     using result
@@ -133,4 +137,10 @@ uniform_int :: #force_inline proc(using program: ShaderProgram, name: string, #a
 uniform_bool :: #force_inline proc(using program: ShaderProgram, name: string, val: bool) {
     location := get_uniform_location(program, name) 
     gl.Uniform1i(location, cast(c.int)val)
+}
+
+uniform_mat4f :: #force_inline proc(using program: ShaderProgram, name: string, val: Mat4f) {
+    location := get_uniform_location(program, name)
+    hack: any = val 
+    gl.UniformMatrix4fv(location, 1, gl.FALSE, alg.to_ptr(cast(^Mat4f)hack.data))
 }
